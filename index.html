@@ -132,7 +132,7 @@
       width: 100%;
       padding: 12px;
       margin-top: 8px;
-      margin-bottom: 3px; /* Further reduced spacing */
+      margin-bottom: 3px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 16px;
@@ -155,7 +155,6 @@
     button:hover {
       background: linear-gradient(90deg, #1565c0, #0d47a1);
     }
-
     .popup-overlay {
       display: none;
       position: fixed;
@@ -168,14 +167,12 @@
       align-items: center;
       backdrop-filter: blur(4px);
     }
-    /* Make the loading box transparent but keep spinner and text visible */
     .popup-overlay.loading {
       display: flex;
       background: rgba(0,0,0,0.2);
       pointer-events: all;
     }
     .popup-box {
-      /* Remove white background and box shadow for loading */
       background: transparent !important;
       border-radius: 0 !important;
       padding: 0 !important;
@@ -189,24 +186,15 @@
       align-items: center;
       gap: 12px;
     }
-    /* Only apply white background and radius for success popup */
-    #successPopup .popup-box {
-      background: #ffffff !important;
-      border-radius: 18px !important;
-      padding: 30px 35px !important;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
-      width: 280px;
-      max-width: 80%;
-      animation: popupFadeIn 0.3s ease;
-      text-align: center;
-      display: block;
-    }
+
+    /* ✅ Updated popup-text to white color */
     .popup-text {
       margin-top: 0;
       font-weight: 600;
-      color: #1565c0;
+      color: #ffffff; /* Changed from blue to white */
       font-size: 17px;
     }
+
     .spinner {
       width: 48px;
       height: 48px;
@@ -216,15 +204,19 @@
       animation: spin 0.9s linear infinite;
       margin: auto;
     }
+
     @keyframes spin { to { transform: rotate(360deg); } }
+
     @keyframes popupFadeIn {
       from { opacity: 0; transform: scale(0.9); }
       to { opacity: 1; transform: scale(1); }
     }
+
     body.loading {
       overflow: hidden;
       pointer-events: none;
     }
+
     body.loading .popup-overlay {
       display: flex;
       pointer-events: all;
@@ -240,6 +232,19 @@
       align-items: center;
       backdrop-filter: blur(4px);
     }
+
+    #successPopup .popup-box {
+      background: #ffffff !important;
+      border-radius: 18px !important;
+      padding: 30px 35px !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+      width: 280px;
+      max-width: 80%;
+      animation: popupFadeIn 0.3s ease;
+      text-align: center;
+      display: block;
+    }
+
     .round-logo {
       display: block;
       margin: 25px auto 10px;
@@ -317,13 +322,12 @@
   <div class="popup-overlay" id="loaderOverlay">
     <div class="popup-box">
       <div class="spinner"></div>
-      <div class="popup-text">Uploading your order...</div>
+      <div class="popup-text">Processing your order...</div>
     </div>
   </div>
 
   <div id="successPopup" class="popup-overlay">
     <div class="popup-box">
-      <div style="font-size: 26px; color: #2e7d32;">🎉</div>
       <div class="popup-text">Congratulations!</div>
       <p style="margin-top: 10px; font-size: 15px; color: #444;">
         Your resources will be delivered via email<br>within the next 60 minutes.
@@ -384,7 +388,6 @@
       const reader = new FileReader();
       reader.onload = function () {
         const base64 = reader.result.split(",")[1];
-        // Show loading overlay with transparent box but spinner visible
         document.body.classList.add('loading');
         loaderOverlay.classList.add('loading');
 
