@@ -132,7 +132,7 @@
       width: 100%;
       padding: 12px;
       margin-top: 8px;
-      margin-bottom: 10px; /* Reduced space */
+      margin-bottom: 3px; /* Further reduced spacing */
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 16px;
@@ -168,18 +168,41 @@
       align-items: center;
       backdrop-filter: blur(4px);
     }
+    /* Make the loading box transparent but keep spinner and text visible */
+    .popup-overlay.loading {
+      display: flex;
+      background: rgba(0,0,0,0.2);
+      pointer-events: all;
+    }
     .popup-box {
-      background: white;
-      border-radius: 18px;
-      padding: 30px 35px;
+      /* Remove white background and box shadow for loading */
+      background: transparent !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
       text-align: center;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      width: auto;
+      max-width: none;
+      animation: popupFadeIn 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    /* Only apply white background and radius for success popup */
+    #successPopup .popup-box {
+      background: #ffffff !important;
+      border-radius: 18px !important;
+      padding: 30px 35px !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
       width: 280px;
       max-width: 80%;
       animation: popupFadeIn 0.3s ease;
+      text-align: center;
+      display: block;
     }
     .popup-text {
-      margin-top: 18px;
+      margin-top: 0;
       font-weight: 600;
       color: #1565c0;
       font-size: 17px;
@@ -217,17 +240,6 @@
       align-items: center;
       backdrop-filter: blur(4px);
     }
-    #successPopup .popup-box {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 30px 28px;
-      text-align: center;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
-      width: 90%;
-      max-width: 320px;
-      animation: popupFadeIn 0.3s ease;
-    }
-
     .round-logo {
       display: block;
       margin: 25px auto 10px;
@@ -326,6 +338,7 @@
     const checkboxes = document.querySelectorAll('.item');
     const totalAmount = document.getElementById('totalAmount');
     const qrPayAmount = document.getElementById('qrPayAmount');
+    const loaderOverlay = document.getElementById('loaderOverlay');
 
     checkboxes.forEach(chk => chk.addEventListener('change', calculateTotal));
 
@@ -371,7 +384,9 @@
       const reader = new FileReader();
       reader.onload = function () {
         const base64 = reader.result.split(",")[1];
+        // Show loading overlay with transparent box but spinner visible
         document.body.classList.add('loading');
+        loaderOverlay.classList.add('loading');
 
         fetch("https://script.google.com/macros/s/AKfycbzGhDJzJ6__d3rdGFW5xtQSEXzlokh0rhJaL2mGlI5-LLt3lkZfLKSstOiz90j3YiHa/exec", {
           method: "POST",
@@ -388,6 +403,7 @@
         .then(res => res.text())
         .then(response => {
           document.body.classList.remove('loading');
+          loaderOverlay.classList.remove('loading');
           if (response.includes("Success")) {
             document.getElementById("formContainer").style.display = 'none';
             document.getElementById("successPopup").style.display = 'flex';
@@ -397,6 +413,7 @@
         })
         .catch(err => {
           document.body.classList.remove('loading');
+          loaderOverlay.classList.remove('loading');
           alert("Submission failed: " + err);
         });
       };
@@ -404,7 +421,7 @@
     }
 
     function goBackToForm() {
-      location.reload(); // Refreshes the page and scrolls to top
+      location.reload();
     }
   </script>
 </body>
