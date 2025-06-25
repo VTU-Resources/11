@@ -1,3 +1,4 @@
+<!-- File: index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,7 +68,6 @@
       background: #f7fcfb;
       border: 1px solid #d8ede6;
       box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-      transition: background 0.2s ease;
       cursor: pointer;
     }
     .product:hover {
@@ -133,12 +133,24 @@
       width: 100%;
       padding: 12px;
       margin-top: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 5px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 16px;
       background-color: #fff;
       box-sizing: border-box;
+    }
+    .error-msg {
+      color: #d32f2f;
+      font-size: 13px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .visible {
+      display: block !important;
+    }
+    .error {
+      border-color: #d32f2f !important;
     }
     button {
       background: linear-gradient(90deg, #1e88e5, #1565c0);
@@ -177,27 +189,55 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    #loaderOverlay {
+    .popup-overlay {
       display: none;
       position: fixed;
       top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(255, 255, 255, 0.9);
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.2);
       z-index: 9998;
       justify-content: center;
       align-items: center;
+      backdrop-filter: blur(4px);
+    }
+    .popup-box {
+      background: white;
+      border-radius: 18px;
+      padding: 30px 35px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      width: 280px;
+      max-width: 80%;
+      animation: popupFadeIn 0.3s ease;
+    }
+    .popup-text {
+      margin-top: 18px;
+      font-weight: 600;
+      color: #1565c0;
+      font-size: 17px;
     }
     .spinner {
-      border: 6px solid #eee;
-      border-top: 6px solid #1565c0;
+      width: 48px;
+      height: 48px;
+      border: 5px solid #ccc;
+      border-top: 5px solid #1565c0;
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
+      animation: spin 0.9s linear infinite;
+      margin: auto;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes popupFadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    body.loading {
+      overflow: hidden;
+      pointer-events: none;
+    }
+    body.loading .popup-overlay {
+      display: flex;
+      pointer-events: all;
     }
     .round-logo {
       display: block;
@@ -216,22 +256,31 @@
       h2 {
         font-size: 22px;
       }
+      .product {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="1.jpg" alt="VTU Logo" class="brand-logo" />
+    <img src="assets/1.jpg" alt="VTU Logo" class="brand-logo" />
     <span class="brand-name">VTU Belgaum</span>
   </header>
 
   <section class="section" id="formContainer">
-    <img src="1.jpg" alt="Round Logo" class="round-logo" />
-    <h2>BCS405D Microcontroller Resources</h2>
+    <img src="assets/1.jpg" alt="Round Logo" class="round-logo" />
+    <h2>BCS405D LINEAR ALGEBRA</h2>
 
-    <input type="text" id="name" placeholder="Your Name" required />
-    <input type="email" id="email" placeholder="Your Email" required />
-    <input type="tel" id="contact" placeholder="Contact Number" required pattern="[0-9]{10}" />
+    <input type="text" id="name" placeholder="Your Name" />
+    <div id="errorName" class="error-msg">Please enter your name.</div>
+
+    <input type="email" id="email" placeholder="Your Email" />
+    <div id="errorEmail" class="error-msg">Please enter a valid email.</div>
+
+    <input type="tel" id="contact" placeholder="Contact Number" pattern="[0-9]{10}" />
+    <div id="errorContact" class="error-msg">Enter a valid 10-digit number.</div>
 
     <div class="combo" onclick="selectCombo()">✅ Get All 3 in Combo @ Just ₹222 (Original ₹815)</div>
 
@@ -262,17 +311,23 @@
     <div class="total">Total: ₹<span id="totalAmount">0</span></div>
 
     <p class="payment-instruction">Scan the QR below and upload the screenshot after payment</p>
-    <img src="1.png" alt="QR Code" class="qr-img" />
+    <img src="assets/1.png" alt="QR Code" class="qr-img" />
 
     <p class="pay-amount">Pay: ₹<span id="qrPayAmount">0</span></p>
 
     <label for="screenshot">Upload Payment Screenshot</label>
-    <input type="file" id="screenshot" required accept="image/*" />
+    <input type="file" id="screenshot" accept="image/*" />
+    <div id="errorScreenshot" class="error-msg">Upload a valid screenshot.</div>
 
     <button onclick="submitForm()">Submit</button>
   </section>
 
-  <div id="loaderOverlay"><div class="spinner"></div></div>
+  <div class="popup-overlay" id="loaderOverlay">
+    <div class="popup-box">
+      <div class="spinner"></div>
+      <div class="popup-text">Uploading your order...</div>
+    </div>
+  </div>
 
   <div id="successPopup">
     <p>🎉 Congratulations!<br>
@@ -308,54 +363,73 @@
       qrPayAmount.textContent = 222;
     }
 
-    function submitForm() {
+    function showError(field, errorId) {
+      document.getElementById(field).classList.add("error");
+      document.getElementById(errorId).classList.add("visible");
+    }
+
+    function clearError(field, errorId) {
+      document.getElementById(field).classList.remove("error");
+      document.getElementById(errorId).classList.remove("visible");
+    }
+
+    function validateForm() {
+      let valid = true;
       const name = document.getElementById("name").value.trim();
       const email = document.getElementById("email").value.trim();
       const contact = document.getElementById("contact").value.trim();
-      const screenshotInput = document.getElementById("screenshot");
-      const file = screenshotInput.files[0];
+      const screenshot = document.getElementById("screenshot").files[0];
 
-      if (!name || !email || !contact || !file) {
-        alert("Please fill all details and upload payment screenshot.");
-        return;
-      }
+      if (!name) { showError("name", "errorName"); valid = false; } else { clearError("name", "errorName"); }
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) { showError("email", "errorEmail"); valid = false; } else { clearError("email", "errorEmail"); }
+      if (!/^\d{10}$/.test(contact)) { showError("contact", "errorContact"); valid = false; } else { clearError("contact", "errorContact"); }
+      if (!screenshot) { showError("screenshot", "errorScreenshot"); valid = false; } else { clearError("screenshot", "errorScreenshot"); }
+
+      return valid;
+    }
+
+    function submitForm() {
+      if (!validateForm()) return;
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const contact = document.getElementById("contact").value.trim();
+      const file = document.getElementById("screenshot").files[0];
 
       const selectedItems = Array.from(checkboxes)
         .filter(chk => chk.checked)
         .map(chk => chk.parentElement.textContent.trim())
-        .join(" + ");
+        .join(" + ") || "Combo";
+
       const total = document.getElementById("totalAmount").textContent;
 
       const reader = new FileReader();
       reader.onload = function () {
         const base64 = reader.result.split(",")[1];
-        document.getElementById("loaderOverlay").style.display = 'flex';
+        document.body.classList.add('loading');
 
         fetch("https://script.google.com/macros/s/AKfycbzGhDJzJ6__d3rdGFW5xtQSEXzlokh0rhJaL2mGlI5-LLt3lkZfLKSstOiz90j3YiHa/exec", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: new URLSearchParams({
-            name: name,
-            email: email,
-            contact: contact,
+            name, email, contact,
             selected: selectedItems,
-            total: total,
-            screenshot: base64
+            total, screenshot: base64
           })
         })
         .then(res => res.text())
         .then(response => {
-          document.getElementById("loaderOverlay").style.display = 'none';
+          document.body.classList.remove('loading');
           if (response.includes("Success")) {
             document.getElementById("formContainer").style.display = 'none';
             document.getElementById("successPopup").style.display = 'block';
           } else {
-            alert("Error submitting form: " + response);
+            alert("Submission error: " + response);
           }
         })
         .catch(err => {
-          document.getElementById("loaderOverlay").style.display = 'none';
-          alert("Submission failed: " + err);
+          document.body.classList.remove('loading');
+          alert("Network error: " + err);
         });
       };
       reader.readAsDataURL(file);
