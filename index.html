@@ -1,4 +1,3 @@
-<!-- File: index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,25 +131,13 @@
     input[type="tel"] {
       width: 100%;
       padding: 12px;
-      margin-top: 10px;
-      margin-bottom: 5px;
+      margin-top: 8px;
+      margin-bottom: 10px; /* Reduced space */
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 16px;
       background-color: #fff;
       box-sizing: border-box;
-    }
-    .error-msg {
-      color: #d32f2f;
-      font-size: 13px;
-      margin-bottom: 10px;
-      display: none;
-    }
-    .visible {
-      display: block !important;
-    }
-    .error {
-      border-color: #d32f2f !important;
     }
     button {
       background: linear-gradient(90deg, #1e88e5, #1565c0);
@@ -168,27 +155,7 @@
     button:hover {
       background: linear-gradient(90deg, #1565c0, #0d47a1);
     }
-    #successPopup {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: white;
-      z-index: 9999;
-      padding: 50px 20px;
-      text-align: center;
-      font-size: 20px;
-      color: #2e7d32;
-    }
-    #successPopup button {
-      margin-top: 20px;
-      background: #1565c0;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+
     .popup-overlay {
       display: none;
       position: fixed;
@@ -239,6 +206,28 @@
       display: flex;
       pointer-events: all;
     }
+
+    #successPopup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.1);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+    #successPopup .popup-box {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 30px 28px;
+      text-align: center;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+      width: 90%;
+      max-width: 320px;
+      animation: popupFadeIn 0.3s ease;
+    }
+
     .round-logo {
       display: block;
       margin: 25px auto 10px;
@@ -248,6 +237,7 @@
       object-fit: cover;
       border: 3px solid #1a4d2e;
     }
+
     @media screen and (max-width: 600px) {
       .section {
         margin: 20px;
@@ -256,31 +246,22 @@
       h2 {
         font-size: 22px;
       }
-      .product {
-        flex-direction: column;
-        align-items: flex-start;
-      }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="assets/1.jpg" alt="VTU Logo" class="brand-logo" />
+    <img src="1.jpg" alt="VTU Logo" class="brand-logo" />
     <span class="brand-name">VTU Belgaum</span>
   </header>
 
   <section class="section" id="formContainer">
-    <img src="assets/1.jpg" alt="Round Logo" class="round-logo" />
+    <img src="1.jpg" alt="Round Logo" class="round-logo" />
     <h2>BCS405D LINEAR ALGEBRA</h2>
 
-    <input type="text" id="name" placeholder="Your Name" />
-    <div id="errorName" class="error-msg">Please enter your name.</div>
-
-    <input type="email" id="email" placeholder="Your Email" />
-    <div id="errorEmail" class="error-msg">Please enter a valid email.</div>
-
-    <input type="tel" id="contact" placeholder="Contact Number" pattern="[0-9]{10}" />
-    <div id="errorContact" class="error-msg">Enter a valid 10-digit number.</div>
+    <input type="text" id="name" placeholder="Your Name" required />
+    <input type="email" id="email" placeholder="Your Email" required />
+    <input type="tel" id="contact" placeholder="Contact Number" required pattern="[0-9]{10}" />
 
     <div class="combo" onclick="selectCombo()">✅ Get All 3 in Combo @ Just ₹222 (Original ₹815)</div>
 
@@ -311,13 +292,12 @@
     <div class="total">Total: ₹<span id="totalAmount">0</span></div>
 
     <p class="payment-instruction">Scan the QR below and upload the screenshot after payment</p>
-    <img src="assets/1.png" alt="QR Code" class="qr-img" />
+    <img src="1.png" alt="QR Code" class="qr-img" />
 
     <p class="pay-amount">Pay: ₹<span id="qrPayAmount">0</span></p>
 
     <label for="screenshot">Upload Payment Screenshot</label>
-    <input type="file" id="screenshot" accept="image/*" />
-    <div id="errorScreenshot" class="error-msg">Upload a valid screenshot.</div>
+    <input type="file" id="screenshot" required accept="image/*" />
 
     <button onclick="submitForm()">Submit</button>
   </section>
@@ -329,10 +309,17 @@
     </div>
   </div>
 
-  <div id="successPopup">
-    <p>🎉 Congratulations!<br>
-    Your resources will be delivered via email within the next 60 minutes.</p>
-    <button onclick="goBackToForm()">OK</button>
+  <div id="successPopup" class="popup-overlay">
+    <div class="popup-box">
+      <div style="font-size: 26px; color: #2e7d32;">🎉</div>
+      <div class="popup-text">Congratulations!</div>
+      <p style="margin-top: 10px; font-size: 15px; color: #444;">
+        Your resources will be delivered via email<br>within the next 60 minutes.
+      </p>
+      <button onclick="goBackToForm()" style="margin-top: 20px; background: #1565c0; border: none; color: white; padding: 10px 22px; font-size: 15px; border-radius: 8px; cursor: pointer;">
+        OK
+      </button>
+    </div>
   </div>
 
   <script>
@@ -363,44 +350,22 @@
       qrPayAmount.textContent = 222;
     }
 
-    function showError(field, errorId) {
-      document.getElementById(field).classList.add("error");
-      document.getElementById(errorId).classList.add("visible");
-    }
-
-    function clearError(field, errorId) {
-      document.getElementById(field).classList.remove("error");
-      document.getElementById(errorId).classList.remove("visible");
-    }
-
-    function validateForm() {
-      let valid = true;
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const contact = document.getElementById("contact").value.trim();
-      const screenshot = document.getElementById("screenshot").files[0];
-
-      if (!name) { showError("name", "errorName"); valid = false; } else { clearError("name", "errorName"); }
-      if (!email || !/^\S+@\S+\.\S+$/.test(email)) { showError("email", "errorEmail"); valid = false; } else { clearError("email", "errorEmail"); }
-      if (!/^\d{10}$/.test(contact)) { showError("contact", "errorContact"); valid = false; } else { clearError("contact", "errorContact"); }
-      if (!screenshot) { showError("screenshot", "errorScreenshot"); valid = false; } else { clearError("screenshot", "errorScreenshot"); }
-
-      return valid;
-    }
-
     function submitForm() {
-      if (!validateForm()) return;
-
       const name = document.getElementById("name").value.trim();
       const email = document.getElementById("email").value.trim();
       const contact = document.getElementById("contact").value.trim();
-      const file = document.getElementById("screenshot").files[0];
+      const screenshotInput = document.getElementById("screenshot");
+      const file = screenshotInput.files[0];
+
+      if (!name || !email || !contact || !file) {
+        alert("Please fill all details and upload payment screenshot.");
+        return;
+      }
 
       const selectedItems = Array.from(checkboxes)
         .filter(chk => chk.checked)
         .map(chk => chk.parentElement.textContent.trim())
-        .join(" + ") || "Combo";
-
+        .join(" + ");
       const total = document.getElementById("totalAmount").textContent;
 
       const reader = new FileReader();
@@ -412,9 +377,12 @@
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: new URLSearchParams({
-            name, email, contact,
+            name: name,
+            email: email,
+            contact: contact,
             selected: selectedItems,
-            total, screenshot: base64
+            total: total,
+            screenshot: base64
           })
         })
         .then(res => res.text())
@@ -422,22 +390,21 @@
           document.body.classList.remove('loading');
           if (response.includes("Success")) {
             document.getElementById("formContainer").style.display = 'none';
-            document.getElementById("successPopup").style.display = 'block';
+            document.getElementById("successPopup").style.display = 'flex';
           } else {
-            alert("Submission error: " + response);
+            alert("Error submitting form: " + response);
           }
         })
         .catch(err => {
           document.body.classList.remove('loading');
-          alert("Network error: " + err);
+          alert("Submission failed: " + err);
         });
       };
       reader.readAsDataURL(file);
     }
 
     function goBackToForm() {
-      document.getElementById("successPopup").style.display = 'none';
-      document.getElementById("formContainer").style.display = 'block';
+      location.reload(); // Refreshes the page and scrolls to top
     }
   </script>
 </body>
